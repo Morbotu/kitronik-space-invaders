@@ -14,17 +14,29 @@ class Game:
 		self.player = Player(self.np)
 		self.bullets = []
 		self.enemies = []
+		self.wave = 0
 		self.enemieShape = [
-			[1, 0, 1, 0, 1, 0, 1],
-			[0, 1, 0, 1, 0, 1, 0]
+			[
+				[1, 0, 1, 0, 1, 0, 1],
+				[0, 1, 0, 1, 0, 1, 0]
+			],
+			[
+				[0, 1, 0, 1, 0, 1, 0],
+				[1, 0, 1, 0, 1, 0, 1]
+			]
 		]
-		for i in range(len(self.enemieShape)):
-			for j in range(len(self.enemieShape[0])):
-				if self.enemieShape[i][j] > 0:
-					self.enemies.append(Enemy(j, i, self.enemieShape[i][j], self.np))
+		self.spawn_enemies()
 		self.rounds = 0
 		self.lastRound = -3
+		self.enemySpeed = 5
+		self.gameOver = False
 		self.game_loop()
+
+	def spawn_enemies(self):
+		for i in range(len(self.enemieShape[self.wave])):
+			for j in range(len(self.enemieShape[self.wave][0])):
+				if self.enemieShape[self.wave][i][j] > 0:
+					self.enemies.append(Enemy(j, i, self.enemieShape[self.wave][i][j], self.np))
 
 	def game_loop(self):
 		while True:
@@ -57,19 +69,28 @@ class Game:
 				self.bullets[i].y -= 1
 
 			# Move enemies according to a set pattern.
-			if self.rounds % 40 == 0 and self.rounds != 0:
+			if self.rounds % (40*self.enemySpeed) == 0 and self.rounds != 0:
 				for i in self.enemies:
 					i.y += 1
-			elif self.rounds % 30 == 0 and self.rounds != 0:
+					if i.y > 7:
+						self.gameOver = True
+						break
+			elif self.rounds % (30*self.enemySpeed) == 0 and self.rounds != 0:
 				for i in self.enemies:
 					i.x -= 1
-			elif self.rounds % 20 == 0 and self.rounds != 0:
+			elif self.rounds % (20*self.enemySpeed) == 0 and self.rounds != 0:
 				for i in self.enemies:
 					i.y += 1
-			elif self.rounds % 10 == 0 and self.rounds != 0:
+					if i.y > 7:
+						self.gameOver = True
+						break
+			elif self.rounds % (10*self.enemySpeed) == 0 and self.rounds != 0:
 				for i in self.enemies:
 					i.x += 1
 			
+			if self.gameOver:
+				break
+
 			self.player.move()
 
 			# Clear screen but only in memory so there is no flicker.
@@ -92,6 +113,12 @@ class Game:
 				music.pitch(500, duration=100, pin=pin2)
 			else:
 				sleep(100)
+			if len(self.enemies) == 0:
+				self.wave += 1
+				display.scroll("Wave " + str(self.wave), delay=100, wait=True)
+				self.spawn_enemies()
+				self.rounds = 0
+		display.scroll("Game Over", wait=True)
 
 class Sprite:
 	"""
