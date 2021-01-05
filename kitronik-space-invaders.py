@@ -28,27 +28,33 @@ lastMoved = -moveSpeed
 enemyDirection = 0
 enemyPatterns = [
     [
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 0],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
     ],
     [
-        [1, 1, 1, 1, 1, 1, 1, 0],
-        [1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
     ],
+    [
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [2, 2, 2, 2, 2, 2, 2, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 3, 0, 4, 0, 3, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [2, 2, 2, 2, 2, 2, 2, 0],
+        [3, 3, 3, 3, 3, 3, 3, 0],
+        [4, 4, 4, 4, 4, 4, 4, 0],
+    ]
 ]
 enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
+for i in range(4):
+    enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
 
 display.show(lives)
 while True:
@@ -136,12 +142,15 @@ while True:
     if len([i for i in enemies if i == [0, 0, 0, 0, 0, 0, 0, 0]]) == 8:
         wave += 1
         display.scroll("Wave " + str(wave))
-        music.play(music.POWER_UP, pin=pin2)
         enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
+        for i in range(4):
+            enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
         rounds = 1
         lastBulletsShot = -shootCoolDown
         lastMoved = -moveSpeed
         enemyDirection = 0
+        if wave % len(enemyPatterns) == 0 and wave != 0:
+            enemySpeed -= 1
         display.show(lives)
 
 music.play(music.DADADADUM, pin=pin2, wait=False)
