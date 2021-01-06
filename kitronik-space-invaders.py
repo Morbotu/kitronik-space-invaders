@@ -4,28 +4,30 @@ from random import randint
 import music
 
 
-def clear_screen(np):
-    """
-    Clear the screen without showing it yet.
-    """
-    for i in range(len(np)):
-        np[i] = (0, 0, 0)
-
-
-np = neopixel.NeoPixel(pin0, 64)
-x = 4
-lives = 5
+np = neopixel.NeoPixel(pin0, 64)  # Alle rgb leds worden bestuurt met neopixel.
+x = 4  # x positie van de speler.
+lives = 5  # Levens van de speler.
+# Matrix van de playerBullets.
 playerBullets = [[0 for j in range(8)] for i in range(8)]
+# Matrix van de enemyBullets.
 enemyBullets = [[0 for j in range(8)] for i in range(8)]
-rounds = 1
+rounds = 1  # Aantal rondes van die de game loop heeft gemaakt.
+# Het aantal rondes dat je moet wachten totdat je een nieuwe kogel kan schieten.
 shootCoolDown = 8
+# Het aantal rondes dat je moet wachten tot je weer een pixel kan bewegen.
 moveSpeed = 2
-bulletSpeed = 2
-enemySpeed = 100
-wave = 0
+bulletSpeed = 2  # Het aantal rondes tussen iedere verplaatsing van de kogels.
+enemySpeed = 100  # Het aantal rondes tussen iedere beweging van de enemies.
+wave = 0  # De wave waar je inzit.
+# In welke ronde de laatste kogel is geschoten.
 lastBulletsShot = -shootCoolDown
-lastMoved = -moveSpeed
-enemyDirection = 0
+lastMoved = -moveSpeed  # In welke ronde de laatste beweging was.
+enemyDirection = 0  # De richting waar de enemies zullen heenbewegen.
+
+# Dit zijn alle levels.
+# Het is alleen de bovenste helft omdat dat minder ruimte opneemt.
+# De onderste helft zijn alleen maar nullen en
+# worden toegevoegt als het level geopend wordt.
 enemyPatterns = [
     [
         [0, 0, 1, 1, 1, 0, 0, 0],
@@ -52,20 +54,26 @@ enemyPatterns = [
         [4, 4, 4, 4, 4, 4, 4, 0],
     ]
 ]
+
+# Hier wordt het level geladen.
+# Het gaat op deze manier om te vermijden er pass by reference is.
 enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
+# Hier worden de laatste vier rijen toegvoegd.
 for i in range(4):
     enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
 
 display.show(lives)
+
+# De game loop.
 while True:
-    # Move playerBullets.
+    # Beweegt playerBullets.
     if rounds % bulletSpeed == 0:
         del playerBullets[0]
         playerBullets.append([0 for i in range(8)])
         del enemyBullets[7]
         enemyBullets.insert(0, [0 for i in range(8)])
 
-    # Move enemies.
+    # Beweegt enemies.
     if rounds % enemySpeed == 0:
         if enemyDirection == 0:
             for i in enemies:
@@ -81,13 +89,17 @@ while True:
         if enemyDirection == 3:
             del enemies[7]
             enemies.insert(0, [0 for i in range(8)])
+
+        # Kijkt of één van de enemies de overkant heeft gehaald.
+        # Dan is het spel over.
         if len([i for i in enemies[7] if i > 0]):
             break
+
         enemyDirection += 1
         if enemyDirection > 3:
             enemyDirection = 0
 
-    # Move the player.
+    # Beweegt de speler.
     if pin13.read_digital() == 0 and x < 7 and rounds - lastMoved >= moveSpeed:
         x += 1
         lastMoved = rounds
@@ -95,45 +107,47 @@ while True:
         x -= 1
         lastMoved = rounds
 
-    # Fire playerBullet.
+    # Vuurt playerBullet.
     if pin15.read_digital() == 0 and rounds - lastBulletsShot >= shootCoolDown:
         playerBullets[6][x] = 1
         lastBulletsShot = rounds
 
-    clear_screen(np)
+    # Zet de waarde van alle pixels op nul maar laat het nog niet op het scherm zien.
+    for i in range(len(np)):
+        np[i] = (0, 0, 0)
 
     for i in range(8):
         for j in range(8):
-            # Draw bullets.
+            # Tekend bullets.
             if playerBullets[i][j]:
-                # PlayerBullets colliding with enemies.
+                # PlayerBullets botst met enemies.
                 if enemies[i][j]:
                     enemies[i][j] -= 1
                     playerBullets[i][j] = 0
                     continue
                 np[j+i*8] = (0, 10, 0)
 
-            # Draw enemies.
+            # Tekend enemies.
             if enemies[i][j]:
-                # Spawn enemyBullets.
+                # Maakt nieuwe enemyBullets.
                 if randint(0, 100) > 99:
                     enemyBullets[i+1][j] = 1
                 np[j+i*8] = (0, 0, 10)
 
-            # Draw enemyBullets.
+            # Teken enemyBullets.
             if enemyBullets[i][j]:
-                # EnemyBullets collide with player.
+                # EnemyBullets botst met speler.
                 if x == j and i == 7:
                     lives -= 1
                     enemyBullets[i][j] = 0
-                    pin1.write_digital(1)
+                    pin1.write_digital(1)  # Laat de microbit trillen.
                     display.show(lives)
                     sleep(10)
                     pin1.write_digital(0)
                     continue
                 np[j+i*8] = (10, 0, 10)
 
-    # Draw the player.
+    # Tekend de speler.
     np[x+7*8] = (10, 0, 0)
     np.show()
     rounds += 1
@@ -153,5 +167,6 @@ while True:
             enemySpeed -= 1
         display.show(lives)
 
+# Het einde van het spel.
 music.play(music.DADADADUM, pin=pin2, wait=False)
 display.scroll("Game Over  Wave " + str(wave))
