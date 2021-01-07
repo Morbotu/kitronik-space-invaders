@@ -3,31 +3,37 @@ import neopixel
 from random import randint
 import music
 
-
-np = neopixel.NeoPixel(pin0, 64)  # Alle rgb leds worden bestuurt met neopixel.
-x = 4  # x positie van de speler.
-lives = 5  # Levens van de speler.
-# Matrix van de playerBullets.
+# All rgb led are controlled by neopixel.
+np = neopixel.NeoPixel(pin0, 64)
+# x position of the player.
+x = 4
+# lives of the player.
+lives = 5
+# Matrix of the playerBullets.
 playerBullets = [[0 for j in range(8)] for i in range(8)]
-# Matrix van de enemyBullets.
+# Matrix of the enemyBullets.
 enemyBullets = [[0 for j in range(8)] for i in range(8)]
-rounds = 1  # Aantal rondes van die de game loop heeft gemaakt.
-# Het aantal rondes dat je moet wachten totdat je een nieuwe kogel kan schieten.
+# Number of rounds the game loop completed.
+rounds = 1
+# Number of rouds you have to wait until you can fire another bullets.
 shootCoolDown = 8
-# Het aantal rondes dat je moet wachten tot je weer een pixel kan bewegen.
+# Number of rounds you have to wait until you can move another pixel.
 moveSpeed = 2
-bulletSpeed = 2  # Het aantal rondes tussen iedere verplaatsing van de kogels.
-enemySpeed = 100  # Het aantal rondes tussen iedere beweging van de enemies.
-wave = 0  # De wave waar je inzit.
-# In welke ronde de laatste kogel is geschoten.
+# Number of rounds between each change of postion of all bullets.
+bulletSpeed = 2
+# Number of rounds between each movement of the enemies.
+enemySpeed = 100
+# The current wave.
+wave = 0
+# In which rounds the player has fired your last bullet.
 lastBulletsShot = -shootCoolDown
-lastMoved = -moveSpeed  # In welke ronde de laatste beweging was.
-enemyDirection = 0  # De richting waar de enemies zullen heenbewegen.
+# In which rounds the player has moved last.
+lastMoved = -moveSpeed
+# In which direction the enemies will move.
+enemyDirection = 0
 
-# Dit zijn alle levels.
-# Het is alleen de bovenste helft omdat dat minder ruimte opneemt.
-# De onderste helft zijn alleen maar nullen en
-# worden toegevoegt als het level geopend wordt.
+# These are all the level.
+# Only the top half is saved to save space in memory.
 enemyPatterns = [
     [
         [0, 0, 1, 1, 1, 0, 0, 0],
@@ -55,25 +61,24 @@ enemyPatterns = [
     ]
 ]
 
-# Hier wordt het level geladen.
-# Het gaat op deze manier om te vermijden er pass by reference is.
+# The level are loaded here.
 enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
-# Hier worden de laatste vier rijen toegvoegd.
+# The last for rows are added here.
 for i in range(4):
     enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
 
 display.show(lives)
 
-# De game loop.
+# The game loop.
 while True:
-    # Beweegt playerBullets.
+    # Moves playerBullets.
     if rounds % bulletSpeed == 0:
         del playerBullets[0]
         playerBullets.append([0 for i in range(8)])
         del enemyBullets[7]
         enemyBullets.insert(0, [0 for i in range(8)])
 
-    # Beweegt enemies.
+    # Moves enemies.
     if rounds % enemySpeed == 0:
         if enemyDirection == 0:
             for i in enemies:
@@ -90,8 +95,8 @@ while True:
             del enemies[7]
             enemies.insert(0, [0 for i in range(8)])
 
-        # Kijkt of één van de enemies de overkant heeft gehaald.
-        # Dan is het spel over.
+        # Check if one of the enemies reached the other side.
+        # Then the game is over.
         if len([i for i in enemies[7] if i > 0]):
             break
 
@@ -99,7 +104,7 @@ while True:
         if enemyDirection > 3:
             enemyDirection = 0
 
-    # Beweegt de speler.
+    # Moves the player.
     if pin13.read_digital() == 0 and x < 7 and rounds - lastMoved >= moveSpeed:
         x += 1
         lastMoved = rounds
@@ -107,52 +112,56 @@ while True:
         x -= 1
         lastMoved = rounds
 
-    # Vuurt playerBullet.
+    # Fires playerBullet.
     if pin15.read_digital() == 0 and rounds - lastBulletsShot >= shootCoolDown:
         playerBullets[6][x] = 1
         lastBulletsShot = rounds
 
-    # Zet de waarde van alle pixels op nul maar laat het nog niet op het scherm zien.
+    # Clears all values in np but doesn't yet show it on the screen.
     for i in range(len(np)):
         np[i] = (0, 0, 0)
 
     for i in range(8):
         for j in range(8):
-            # Tekend bullets.
+            # Draw bullets.
             if playerBullets[i][j]:
-                # PlayerBullets botst met enemies.
+                # PlayerBullets collides with enemies.
                 if enemies[i][j]:
                     enemies[i][j] -= 1
                     playerBullets[i][j] = 0
                     continue
                 np[j+i*8] = (0, 10, 0)
 
-            # Tekend enemies.
+            # Draw enemies.
             if enemies[i][j]:
-                # Maakt nieuwe enemyBullets.
+                # Makes new enemyBullets.
                 if randint(0, 100) > 99:
                     enemyBullets[i+1][j] = 1
                 np[j+i*8] = (0, 0, 10)
 
-            # Teken enemyBullets.
+            # Draw enemyBullets.
             if enemyBullets[i][j]:
-                # EnemyBullets botst met speler.
+                # EnemyBullets Collides with player.
                 if x == j and i == 7:
                     lives -= 1
                     enemyBullets[i][j] = 0
-                    pin1.write_digital(1)  # Laat de microbit trillen.
+                    pin1.write_digital(1)  # Let the microbit vibrate.
                     display.show(lives)
                     sleep(10)
                     pin1.write_digital(0)
                     continue
                 np[j+i*8] = (10, 0, 10)
 
-    # Tekend de speler.
+    # Draw the player.
     np[x+7*8] = (10, 0, 0)
     np.show()
     rounds += 1
+
+    # Checks if lives are zero then stops game.
     if lives <= 0:
         break
+
+    # If there are no enemies left, then a new wave starts.
     if len([i for i in enemies if i == [0, 0, 0, 0, 0, 0, 0, 0]]) == 8:
         wave += 1
         display.scroll("Wave " + str(wave))
@@ -167,6 +176,6 @@ while True:
             enemySpeed -= 1
         display.show(lives)
 
-# Het einde van het spel.
+# The end of the game.
 music.play(music.DADADADUM, pin=pin2, wait=False)
 display.scroll("Game Over  Wave " + str(wave))
