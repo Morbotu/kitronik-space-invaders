@@ -90,4 +90,4 @@ or if you want to convert it to hex.
 
 ## License
 
-MIT
+[MIT](LICENSE)
