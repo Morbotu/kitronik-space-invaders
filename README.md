@@ -35,7 +35,7 @@ if rounds % enemySpeed == 0:
         enemies.insert(0, [0 for i in range(8)])
 ```
 
-To check collision and draw the object I made a loop that check all 64 spot in the matrix. Every check is done in this loop to make it faster. For example, to check if a bullet and an enemy are at the same location the program looks if there is a bullet at the spot it's currently checking and if thats true it check if there is also an enemy.
+To check collision and draw the object I made a loop that checks all 64 spots in the matrix. Every check is done in this loop to make it faster. For example, to check if a bullet and an enemy are at the same location the program looks if there is a bullet at the spot it's currently checking and if thats true it check if there is also an enemy.
 
 ```python
 # Draw bullets.
@@ -72,7 +72,7 @@ Now get your python file ready. I minified mine with the command.
 
 `pyminifier -o kitronik-space-invaders.min.py --obfuscate-variables --obfuscate-functions --obfuscate-classes kitronik-space-invaders.py`
 
-I used the obfuscation to replace all variable, functions and classes names with single letters. After minifying flash your file to the micro:bit.
+I used the obfuscation to replace all variables, functions and classes names with single letters. After minifying flash your file to the micro:bit.
 
 `uflash kitronik-space-invaders.min.py`
 or if you want to convert it to hex.
