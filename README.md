@@ -2,7 +2,7 @@
 
 This repo contains a project I needed to make for school. I is space invaders for on the micro:bit with a [:GAME ZIP 64](https://kitronik.co.uk/products/5626-game-zip-64-for-the-bbc-microbit) attached.
 
-![space invader gif](images/space-invaders.gif)
+![space invader gif](images/space-invaders.jpg)
 
 ## Table of contents
 
