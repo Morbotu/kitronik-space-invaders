@@ -10,9 +10,9 @@ x = 4
 # lives of the player.
 lives = 5
 # Matrix of the playerBullets.
-playerBullets = [[0 for j in range(8)] for i in range(8)]
+playerBullets = [[0]*8]*8
 # Matrix of the enemyBullets.
-enemyBullets = [[0 for j in range(8)] for i in range(8)]
+enemyBullets = [[0]*8]*8
 # Number of rounds the game loop completed.
 rounds = 1
 # Number of rouds you have to wait until you can fire another bullets.
@@ -62,10 +62,8 @@ enemyPatterns = [
 ]
 
 # The level are loaded here.
-enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
-# The last for rows are added here.
-for i in range(4):
-    enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
+enemies = [list(i) for i in enemyPatterns[wave %
+                                          len(enemyPatterns)]] + [[0]*8]*4
 
 display.show(lives)
 
@@ -74,9 +72,9 @@ while True:
     # Moves playerBullets.
     if rounds % bulletSpeed == 0:
         del playerBullets[0]
-        playerBullets.append([0 for i in range(8)])
+        playerBullets.append([0]*8)
         del enemyBullets[7]
-        enemyBullets.insert(0, [0 for i in range(8)])
+        enemyBullets.insert(0, [0]*8)
 
     # Moves enemies.
     if rounds % enemySpeed == 0:
@@ -86,14 +84,14 @@ while True:
                 i.insert(0, 0)
         if enemyDirection == 1:
             del enemies[7]
-            enemies.insert(0, [0 for i in range(8)])
+            enemies.insert(0, [0]*8)
         if enemyDirection == 2:
             for i in enemies:
                 del i[0]
                 i.append(0)
         if enemyDirection == 3:
             del enemies[7]
-            enemies.insert(0, [0 for i in range(8)])
+            enemies.insert(0, [0]*8)
 
         # Check if one of the enemies reached the other side.
         # Then the game is over.
@@ -165,9 +163,8 @@ while True:
     if len([i for i in enemies if i == [0, 0, 0, 0, 0, 0, 0, 0]]) == 8:
         wave += 1
         display.scroll("Wave " + str(wave))
-        enemies = [list(i) for i in enemyPatterns[wave % len(enemyPatterns)]]
-        for i in range(4):
-            enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
+        enemies = [list(i) for i in enemyPatterns[wave %
+                                                  len(enemyPatterns)]] + [[0]*8]*4
         rounds = 1
         lastBulletsShot = -shootCoolDown
         lastMoved = -moveSpeed
