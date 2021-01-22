@@ -6,11 +6,27 @@ This repo contains a project I needed to make for school. It is space invaders f
 
 ## Table of contents
 
+-   [Goals](#goals)
 -   [How does it work](#how-does-it-work)
 -   [Tools](#tools)
 -   [Dev](#dev)
 -   [Documentation reference](#documentation-reference)
 -   [License](#license)
+
+## Goals
+
+-   Player
+    -   Moving left and right
+    -   Firing bullets
+    -   5 lives
+    -   When hit, loses one live and bullet is destroyed
+-   Enemies
+    -   Firing bullets
+    -   Moving in a zigzag pattern down
+    -   In patterns with different number of lives
+    -   When hit, loses one live and bullet is destroyed
+-   Endless playable but it gets faster
+-   Waves
 
 ## How does it work
 
@@ -46,6 +62,73 @@ if playerBullets[i][j]:
         playerBullets[i][j] = 0
         continue
     np[j+i*8] = (0, 10, 0)
+```
+
+The enemy waves are stored in a list of 2d lists.
+
+```python
+enemyPatterns = [
+    [
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ],
+    [
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [2, 2, 2, 2, 2, 2, 2, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 3, 0, 4, 0, 3, 0, 0],
+    ],
+    [
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [2, 2, 2, 2, 2, 2, 2, 0],
+        [3, 3, 3, 3, 3, 3, 3, 0],
+        [4, 4, 4, 4, 4, 4, 4, 0],
+    ]
+]
+```
+
+Only the top half is saved to save memory. When a new wave is loaded is calculates with pattern to use with the formula below.
+
+```python
+wave % len(enemyPatterns)
+```
+
+Then the extra four rows are added.
+
+```python
+for i in range(4):
+    enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
+```
+
+When all the patterns are completed then the game becomes a bit faster and the patterns will start from the beginning.
+
+The enemies shoot bullets at random. For each enemy there is a one percent chance to shoot a bullet each round.
+
+The player moves when `JOYPAD_RIGHT` and `JOYPAD_LEFT` are pressed. There is also a cool down. Each time the player moves it saves which round it was and only moves when a set number of rounds have passed since then.
+
+```python
+if pin13.read_digital() == 0 and x < 7 and rounds - lastMoved >= moveSpeed:
+    x += 1
+    lastMoved = rounds
+if pin12.read_digital() == 0 and x > 0 and rounds - lastMoved >= moveSpeed:
+    x -= 1
+    lastMoved = rounds
+```
+
+The shooting works the same as moving. When `FIRE_SW_1` is pressed a bullet is spawned at the location of the player.
+
+```python
+if pin15.read_digital() == 0 and rounds - lastBulletsShot >= shootCoolDown:
+    playerBullets[6][x] = 1
+    lastBulletsShot = rounds
 ```
 
 ## Tools
