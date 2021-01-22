@@ -2,101 +2,98 @@ from microbit import*
 import neopixel
 from random import randint
 import music
-np=neopixel.NeoPixel(pin0,64) 
-x=4 
-f=5 
-U=[[0 for j in range(8)]for i in range(8)]
-D=[[0 for j in range(8)]for i in range(8)]
-b=1 
-l=8
-u=2
-P=2 
-B=100 
-h=0 
-I=-l
-i=-u 
-R=0 
-X=[[[0,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0],],[[0,0,1,1,1,0,0,0],[0,1,0,1,0,1,0,0],[0,0,1,1,1,0,0,0],[0,1,0,1,0,1,0,0],],[[1,1,1,1,1,1,1,0],[2,2,2,2,2,2,2,0],[0,0,0,0,0,0,0,0],[0,3,0,4,0,3,0,0],],[[1,1,1,1,1,1,1,0],[2,2,2,2,2,2,2,0],[3,3,3,3,3,3,3,0],[4,4,4,4,4,4,4,0],]]
-o=[list(i)for i in X[h%len(X)]]
-for i in range(4):
- o.append([0,0,0,0,0,0,0,0])
-display.show(f)
+np=neopixel.NeoPixel(pin0,64)
+x=4
+S=5
+r=[[0]*8]*8
+K=[[0]*8]*8
+T=1
+m=8
+N=2
+X=2
+M=100
+a=0
+Q=-m
+G=-N
+U=0
+g=[[[0,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,0],],[[0,0,1,1,1,0,0,0],[0,1,0,1,0,1,0,0],[0,0,1,1,1,0,0,0],[0,1,0,1,0,1,0,0],],[[1,1,1,1,1,1,1,0],[2,2,2,2,2,2,2,0],[0,0,0,0,0,0,0,0],[0,3,0,4,0,3,0,0],],[[1,1,1,1,1,1,1,0],[2,2,2,2,2,2,2,0],[3,3,3,3,3,3,3,0],[4,4,4,4,4,4,4,0],]]
+F=[list(i)for i in g[a%len(g)]]+[[0]*8]*4
+display.show(S)
 while True:
- if b%P==0:
-  del U[0]
-  U.append([0 for i in range(8)])
-  del D[7]
-  D.insert(0,[0 for i in range(8)])
- if b%B==0:
-  if R==0:
-   for i in o:
+ if T%X==0:
+  del r[0]
+  r.append([0]*8)
+  del K[7]
+  K.insert(0,[0]*8)
+ if T%M==0:
+  if U==0:
+   for i in F:
     del i[7]
     i.insert(0,0)
-  if R==1:
-   del o[7]
-   o.insert(0,[0 for i in range(8)])
-  if R==2:
-   for i in o:
+  if U==1:
+   del F[7]
+   F.insert(0,[0]*8)
+  if U==2:
+   for i in F:
     del i[0]
     i.append(0)
-  if R==3:
-   del o[7]
-   o.insert(0,[0 for i in range(8)])
-  if len([i for i in o[7]if i>0]):
+  if U==3:
+   del F[7]
+   F.insert(0,[0]*8)
+  if len([i for i in F[7]if i>0]):
    break
-  R+=1
-  if R>3:
-   R=0
- if pin13.read_digital()==0 and x<7 and b-i>=u:
+  U+=1
+  if U>3:
+   U=0
+ if pin13.read_digital()==0 and x<7 and T-G>=N:
   x+=1
-  i=b
- if pin12.read_digital()==0 and x>0 and b-i>=u:
+  G=T
+ if pin12.read_digital()==0 and x>0 and T-G>=N:
   x-=1
-  i=b
- if pin15.read_digital()==0 and b-I>=l:
-  U[6][x]=1
-  I=b
+  G=T
+ if pin15.read_digital()==0 and T-Q>=m:
+  r[6][x]=1
+  Q=T
  for i in range(len(np)):
   np[i]=(0,0,0)
  for i in range(8):
   for j in range(8):
-   if U[i][j]:
-    if o[i][j]:
-     o[i][j]-=1
-     U[i][j]=0
+   if r[i][j]:
+    if F[i][j]:
+     F[i][j]-=1
+     r[i][j]=0
      continue
     np[j+i*8]=(0,10,0)
-   if o[i][j]:
+   if F[i][j]:
     if randint(0,100)>99:
-     D[i+1][j]=1
+     K[i+1][j]=1
     np[j+i*8]=(0,0,10)
-   if D[i][j]:
+   if K[i][j]:
     if x==j and i==7:
-     f-=1
-     D[i][j]=0
+     S-=1
+     K[i][j]=0
      pin1.write_digital(1) 
-     display.show(f)
+     display.show(S)
      sleep(10)
      pin1.write_digital(0)
      continue
     np[j+i*8]=(10,0,10)
  np[x+7*8]=(10,0,0)
  np.show()
- b+=1
- if f<=0:
+ T+=1
+ if S<=0:
   break
- if len([i for i in o if i==[0,0,0,0,0,0,0,0]])==8:
-  h+=1
-  display.scroll("Wave "+str(h))
-  o=[list(i)for i in X[h%len(X)]]
-  for i in range(4):
-   o.append([0,0,0,0,0,0,0,0])
-  b=1
-  I=-l
-  i=-u
-  R=0
-  if h%len(X)==0 and h!=0:
-   B-=1
-  display.show(f)
+ if len([i for i in F if i==[0,0,0,0,0,0,0,0]])==8:
+  a+=1
+  display.scroll("Wave "+str(a))
+  F=[list(i)for i in g[a%len(g)]]+[[0]*8]*4
+  T=1
+  Q=-m
+  G=-N
+  U=0
+  if a%len(g)==0 and a!=0:
+   M-=1
+  display.show(S)
 music.play(music.DADADADUM,pin=pin2,wait=False)
-display.scroll("Game Over  Wave "+str(h))
+display.scroll("Game Over  Wave "+str(a))
+# Created by pyminifier (https://github.com/liftoff/pyminifier)
