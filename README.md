@@ -101,13 +101,6 @@ Only the top half is saved to save memory. When a new wave is loaded is calculat
 wave % len(enemyPatterns)
 ```
 
-Then the extra four rows are added.
-
-```python
-for i in range(4):
-    enemies.append([0, 0, 0, 0, 0, 0, 0, 0])
-```
-
 When all the patterns are completed then the game becomes a bit faster and the patterns will start from the beginning.
 
 The enemies shoot bullets at random. For each enemy there is a one percent chance to shoot a bullet each round.
